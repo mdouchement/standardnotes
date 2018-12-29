@@ -1,0 +1,31 @@
+version: '2'
+
+services:
+  web:
+    image: nginx:1.13-alpine
+    ports:
+      - "8080:80"
+    volumes_from:
+      - standardnotes:ro
+    links:
+      - standardnotes:app-container
+    restart: always
+
+  standardnotes:
+    image: standardnotes
+    links:
+      - database:database
+    environment:
+      # Database connection
+      DB_HOST: database
+      DB_USERNAME: root
+      DB_PASSWORD: root
+      DB_DATABASE: standardnotes
+    restart: always
+
+  database:
+    image: mysql:8
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    restart: always

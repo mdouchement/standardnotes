@@ -1,6 +1,9 @@
 version: '2'
 
 services:
+  # The NGINX server is just here
+  # to serve static assets because Rails is pretty bad for this purpose.
+  # TLS stuff can be handled by router like Traefik.
   web:
     image: nginx:1.13-alpine
     ports:
@@ -20,7 +23,7 @@ services:
       DB_HOST: database
       DB_USERNAME: root
       DB_PASSWORD: root
-      DB_DATABASE: standardnotes
+      DB_DATABASE: standardfile
     restart: always
 
   database:
@@ -28,4 +31,9 @@ services:
     command: --default-authentication-plugin=mysql_native_password
     environment:
       MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - db_data:/var/lib/mysql
     restart: always
+
+volumes:
+  db_data:

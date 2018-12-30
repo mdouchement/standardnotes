@@ -1,7 +1,15 @@
 # update stage #################################################################
 #
 # The purpose of this stage is to update the github project.
-FROM ruby:2.5-alpine as update-env
+# Then the next stage is more rubish way of dockerizing a Rails application.
+#
+# It modifies the folowing:
+#   - Move `puma' to production dependencies
+#   - Update `Gemfile.lock' to get latest gems, especially mysql2 up to 0.4.10 (for compilation purpose)
+#
+# Note: These modifications should be ported directly inside the repository https://github.com/standardfile/ruby-server
+#
+FROM ruby:2.6-alpine as update-env
 MAINTAINER mdouchement
 
 # Set the locale
@@ -24,15 +32,13 @@ RUN apk add --update --no-cache \
 RUN git clone https://github.com/standardfile/ruby-server.git /usr/src/app
 WORKDIR /usr/src/app
 
-# Install missing dependencies (that should not be in the development/test group from Gemfile)
+# Do the changes
 COPY Gemfile Gemfile
-
-# Update to latest dependencies (for mysql2 at least)
 RUN bundle update
 
 
 # build stage ##################################################################
-FROM ruby:2.5-alpine as build-env
+FROM ruby:2.6-alpine as build-env
 MAINTAINER mdouchement
 
 # Set the locale
@@ -64,6 +70,7 @@ RUN apk add --update --no-cache \
 
 
 RUN git clone https://github.com/standardfile/ruby-server.git /usr/src/app
+# Retreive updated file from previous stage.
 COPY --from=update-env /usr/src/app/Gemfile /usr/src/app/Gemfile
 COPY --from=update-env /usr/src/app/Gemfile.lock /usr/src/app/Gemfile.lock
 WORKDIR /usr/src/app
@@ -80,7 +87,7 @@ RUN bower install --allow-root
 RUN bundle exec rake assets:precompile
 
 # final stage ##################################################################
-FROM ruby:2.5-alpine
+FROM ruby:2.6-alpine
 MAINTAINER mdouchement
 
 # Set the locale

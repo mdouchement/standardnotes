@@ -7,7 +7,7 @@ This repository contains all the configuration to generate the [StandardNotes](h
 - Build the image
 
 ```sh
-docker build -t standardnotes .
+docker build -t standardfile .
 ```
 
 - Run the stack
@@ -19,7 +19,7 @@ docker-compose up -d
 - Run the database migrations
 
 ```sh
-docker exec -it standardnotes_standardnotes_1 bundle exec rails db:create db:migrate
+docker exec -it standardfile_app bundle exec rails db:create db:migrate
 ```
 
 ## License

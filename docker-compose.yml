@@ -6,16 +6,18 @@ services:
   # TLS stuff can be handled by router like Traefik.
   web:
     image: nginx:1.13-alpine
+    container_name: standardfile_web
     ports:
       - "8080:80"
     volumes_from:
-      - standardnotes:ro
+      - standardfile:ro
     links:
-      - standardnotes:app-container
+      - standardfile:app-container
     restart: always
 
-  standardnotes:
-    image: standardnotes
+  standardfile:
+    image: standardfile
+    container_name: standardfile_app
     links:
       - database:database
     environment:
@@ -28,6 +30,7 @@ services:
 
   database:
     image: mysql:8
+    container_name: standardfile_db
     command: --default-authentication-plugin=mysql_native_password
     environment:
       MYSQL_ROOT_PASSWORD: root

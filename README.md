@@ -22,6 +22,8 @@ docker-compose up -d
 docker exec -it standardfile_app bundle exec rails db:create db:migrate
 ```
 
+> You may need to restart the docker-compose after running the migration `docker-compose restart`.
+
 ## License
 
 **MIT**

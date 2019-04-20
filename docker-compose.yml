@@ -1,4 +1,4 @@
-version: '2'
+version: '2.1'
 
 services:
   # The NGINX server is just here
@@ -13,6 +13,8 @@ services:
       - standardfile:ro
     links:
       - standardfile:app-container
+    depends_on:
+      - standardfile
     restart: always
 
   standardfile:
@@ -20,6 +22,8 @@ services:
     container_name: standardfile_app
     links:
       - database:database
+    depends_on:
+      - database
     environment:
       # Database connection
       DB_HOST: database

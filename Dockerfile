@@ -25,9 +25,7 @@ RUN apk add --update --no-cache \
   mariadb-dev \
   libxml2-dev \
   libxslt-dev \
-  tzdata \
-  nodejs \
-  nodejs-npm
+  tzdata
 
 RUN git clone https://github.com/standardfile/ruby-server.git /usr/src/app
 WORKDIR /usr/src/app
@@ -49,6 +47,7 @@ ENV GEM_HOME /usr/src/app/vendor/gems
 ENV GEM_PATH /usr/src/app/vendor/gems
 ENV RAILS_ENV production
 ENV RACK_ENV production
+ENV EXECJS_RUNTIME Disabled
 # Namespace for the application. Necessary for the asset compilation
 # Update as needed
 # ENV RAILS_RELATIVE_URL_ROOT /standardnotes
@@ -64,9 +63,7 @@ RUN apk add --update --no-cache \
   mariadb-dev \
   libxml2-dev \
   libxslt-dev \
-  tzdata \
-  nodejs \
-  nodejs-npm
+  tzdata
 
 
 RUN git clone https://github.com/standardfile/ruby-server.git /usr/src/app
@@ -75,16 +72,15 @@ COPY --from=update-env /usr/src/app/Gemfile /usr/src/app/Gemfile
 COPY --from=update-env /usr/src/app/Gemfile.lock /usr/src/app/Gemfile.lock
 WORKDIR /usr/src/app
 
+# Fix shitty Sprockets (asset packaging system) error due to no longer dashboard/frontend:
+#   Expected to find a manifest file in `app/assets/config/manifest.js` (Sprockets::Railtie::ManifestNeededError)
+RUN mkdir -p app/assets/config \
+  touch app/assets/config/manifest.js
 
 # throw errors if Gemfile has been modified since Gemfile.lock
 RUN bundle config build.nokogiri
 RUN bundle config --global frozen 1
 RUN bundle install --deployment --without development test
-
-RUN npm install -g bower
-RUN bower install --allow-root
-
-RUN bundle exec rake assets:precompile
 
 # final stage ##################################################################
 FROM ruby:2.6-alpine

@@ -33,7 +33,7 @@ services:
     restart: always
 
   database:
-    image: mysql:8
+    image: mysql
     container_name: standardfile_db
     command: --default-authentication-plugin=mysql_native_password
     environment:
